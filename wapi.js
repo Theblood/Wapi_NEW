@@ -1433,22 +1433,6 @@ window.WAPI.promoteParticipantAdminGroup = function(idGroup, idParticipant, done
     
 }
 
-window.WAPI.sendSeen = function (id, done) {
-    var chat = window.WAPI.getChat(id);
-    if (chat !== undefined) {
-        if (done !== undefined) {
-            chat.sendSeen(false).then(function () {
-                done(true);
-            });
-            return true;
-        } else {
-            chat.sendSeen(false);
-            return true;
-        }
-    }
-    if (done !== undefined) done();
-    return false;
-};
 
 /**
  * Demote Admin of Group
