@@ -1258,8 +1258,7 @@ window.WAPI.sendImage = function (imgBase64, chatid, filename, caption, done) {
             if (done !== undefined) done(true);
         });
     });
-    }
-};
+}
 
 window.WAPI.base64ImageToFile = function (b64Data, filename) {
     var arr = b64Data.split(','), mime = arr[0].match(/:(.*?);/)[1],
