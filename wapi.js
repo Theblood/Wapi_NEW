@@ -69,6 +69,10 @@ if (!window.Store) {
                     id: "SendTextMsgToChat",
                     conditions: (module) => (module.sendTextMsgToChat) ? module.sendTextMsgToChat : null
                 },
+                {  
+                    id: "SendSeen",
+                    conditions: (module) => (module.sdendSeen) ? module.sendSeen : null
+                },
             ];
             for (let idx in modules) {
                 if ((typeof modules[idx] === "object") && (modules[idx] !== null)) {
