@@ -1083,7 +1083,7 @@ window.WAPI.getBatteryLevel = function (done) {
 };
 
 window.WAPI.deleteConversation = function (chatId, done) {
-    let userId = new window.Store.UserConstructor(chatId);
+    let userId = new window.Store.UserConstructor(chatId, {intentionallyUsePrivateConstructor: true});
     let conversation = window.Store.Chat.get(userId);
 
     if(!conversation) {
@@ -1107,7 +1107,7 @@ window.WAPI.deleteConversation = function (chatId, done) {
 };
 
 window.WAPI.deleteMessage = function (chatId, messageArray, revoke=false, done) {
-    let userId = new window.Store.UserConstructor(chatId);
+    let userId = new window.Store.UserConstructor(chatId, {intentionallyUsePrivateConstructor: true});
     let conversation = window.Store.Chat.get(userId);
 
     if(!conversation) {
@@ -1247,7 +1247,7 @@ window.WAPI.getBufferedNewMessages = function(done) {
 
 window.WAPI.sendImage = function (imgBase64, chatid, filename, caption, done) {
     //var idUser = new window.Store.UserConstructor(chatid);
-    var idUser = new window.Store.UserConstructor(id, {intentionallyUsePrivateConstructor: true});
+    var idUser = new window.Store.UserConstructor(chatid, {intentionallyUsePrivateConstructor: true});
     // create new chat
     return Store.Chat.find(idUser).then((chat) => {
         var mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
@@ -1461,3 +1461,4 @@ window.WAPI.demoteParticipantAdminGroup = function(idGroup, idParticipant, done)
         done(true); return true; 
     })
 }
+
