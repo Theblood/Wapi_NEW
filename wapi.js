@@ -763,7 +763,7 @@ window.WAPI.sendMessageToID = function (id, message, done) {
 
         firstChat = Store.Chat.models[0];
         var originalID = firstChat.id;
-        firstChat.id = typeof originalID === "string" ? id : new window.Store.UserConstructor(id);
+        firstChat.id = typeof originalID === "string" ? id : new window.Store.UserConstructor(id, {intentionallyUsePrivateConstructor: true});
         if (done !== undefined) {
             firstChat.sendMessage(message).then(function () {
                 firstChat.id = originalID;
