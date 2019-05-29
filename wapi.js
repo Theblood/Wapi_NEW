@@ -864,15 +864,16 @@ window.WAPI.sendMessage2 = function (id, message, done) {
 
 
 window.WAPI.sendSeen = function (id, done) {
-    var chat = window.WAPI.getChat(id);
+    //Store.SendSeen(Store.Chat.get('XXX@c.us'), false)
+    var chat = window.WAPI.Chat.get(id);
     if (chat !== undefined) {
-        if (done !== undefined) {
-            chat.sendSeen(false).then(function () {
+       if (done !== undefined) {
+            WAPI.SendSeen(Store.Chat.get(id), false).then(function () {
                 done(true);
             });
             return true;
         } else {
-            chat.sendSeen(false);
+            WAPI.SendSeen(Store.Chat.get(id), false)
             return true;
         }
     }
