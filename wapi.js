@@ -106,7 +106,7 @@ if (!window.Store) {
                             }
                         });
                         window.Store.ChatClass.default.prototype.sendMessage = function (e) {
-                            window.Store.SendTextMsgToChat(this, ...arguments);
+                            return window.Store.SendTextMsgToChat(this, ...arguments);
                         }
                         return window.Store;
                     }
