@@ -750,17 +750,31 @@ window.WAPI.sendMessageToID = function (id, message, done) {
         //NEW
         var idUser = new window.Store.UserConstructor(id, {intentionallyUsePrivateConstructor: true});
         // create new chat
-        return Store.Chat.find(idUser).then((chat) => {
-            if (done !== undefined) {
-                chat.sendMessage(message).then(function () {
+       // return Store.Chat.find(idUser).then((chat) => {
+         //   if (done !== undefined) {
+           //     chat.sendMessage(message).then(function () {
+             //       done(true);
+              //  });
+               // return true;
+            //} else {
+              //  chat.sendMessage(message);
+               // return true;
+           // }
+        window.getContact = ( id ) => {
+            return Store.WapQuery.queryExist(id)
+        }
+        window.getContact(id).then(contact => {
+            if(contact.status === 404){
+                done(true);
+            }else {
+                Store.Chat.find(contact.jid).then(chat => {
+                    chat.sendMessage(message);
+                    return true;
+                    }).catch(reject => {
                     done(true);
-                });
-                return true;
-            } else {
-                chat.sendMessage(message);
-                return true;
+                }); 
             }
-        });
+          });
     } catch (e) {
         if (window.Store.Chat.length === 0)
             return false;
