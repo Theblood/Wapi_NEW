@@ -443,10 +443,10 @@ window.WAPI.getUnreadMessagesInChat = function (id, includeMe, includeNotificati
         let messageObj = messages[i];
 
         // found a read message: stop looking for others
-        if (typeof (messageObj.isNewMsg) !== "boolean" || messageObj.isNewMsg === false) {
+        if (typeof (messageObj.__x_isUnreadType) !== "boolean" || messageObj.__x_isUnreadType === false) {
             continue;
         } else {
-            messageObj.isNewMsg = false;
+            messageObj.__x_isUnreadType = false;
             // process it
             let message = WAPI.processMessageObj(messageObj,
                     includeMe,
@@ -906,13 +906,13 @@ window.WAPI.getUnreadMessages = function (includeMe, includeNotifications, use_u
         let messageGroup = WAPI._serializeChatObj(messageGroupObj);
         messageGroup.messages = [];
 
-        const messages = messageGroupObj.msgs.models;
+        const messages = messageGroupObj.msgs._models;
         for (let i = messages.length - 1; i >= 0; i--) {
             let messageObj = messages[i];
-            if (typeof (messageObj.isNewMsg) != "boolean" || messageObj.isNewMsg === false) {
+            if (typeof (messageObj.__x_isUnreadType) != "boolean" || messageObj.__x_isUnreadType === false) {
                 continue;
             } else {
-                messageObj.isNewMsg = false;
+                messageObj.__x_isUnreadType = false;
                 let message = WAPI.processMessageObj(messageObj, includeMe, includeNotifications);
                 if (message) {
                     messageGroup.messages.push(message);
@@ -1165,7 +1165,7 @@ window.Store.Msg.off('add');
 sessionStorage.removeItem('saved_msgs');
 
 window.WAPI._newMessagesListener = window.Store.Msg.on('add', (newMessage) => {
-    if (newMessage && newMessage.isNewMsg && !newMessage.isSentByMe) {
+    if (newMessage && newMessage.__x_isUnreadType && !newMessage.isSentByMe) {
         let message = window.WAPI.processMessageObj(newMessage, false, false);
         if (message) {
             window.WAPI._newMessagesQueue.push(message);
@@ -1325,7 +1325,7 @@ window.WAPI.sendVCard = function(chatId, vcard) {
         self: "out",
         t: parseInt(new Date().getTime() / 1000),
         to: chatId,
-        isNewMsg: !0,
+        __x_isUnreadType: !0,
     };
 
     if (Array.isArray(vcard)) {
@@ -1461,4 +1461,5 @@ window.WAPI.demoteParticipantAdminGroup = function(idGroup, idParticipant, done)
         done(true); return true; 
     })
 }
+
 
