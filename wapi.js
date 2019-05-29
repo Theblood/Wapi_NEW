@@ -72,7 +72,7 @@ if (!window.Store) {
                 {  
                     id: "SendSeen",
                     conditions: (module) => (module.sdendSeen) ? module.sendSeen : null
-                },
+                }
             ];
             for (let idx in modules) {
                 if ((typeof modules[idx] === "object") && (modules[idx] !== null)) {
@@ -864,17 +864,16 @@ window.WAPI.sendMessage2 = function (id, message, done) {
 
 
 window.WAPI.sendSeen = function (id, done) {
-    //Store.SendSeen(Store.Chat.get('XXX@c.us'), false)
-    var chat = window.WAPI.Chat.get(id);
+    var chat = window.WAPI.getChat(id);
     if (chat !== undefined) {
-       if (done !== undefined) {
-            WAPI.SendSeen(Store.Chat.get(id), false).then(function () {
-                done(true);
-            });
+        if (done !== undefined) {
+            window.Store.SendSeen(chat, false);
+             done(true);
             return true;
         } else {
-            WAPI.SendSeen(Store.Chat.get(id), false)
+            window.Store.SendSeen(chat, false);
             return true;
+             done(true);
         }
     }
     if (done !== undefined) done();
