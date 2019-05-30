@@ -1,4 +1,4 @@
-    /* eslint-disable */
+        /* eslint-disable */
     /**
      * This script contains WAPI functions that need to be run in the context of the webpage
      */
@@ -71,6 +71,10 @@
                     {
                         id: "SendTextMsgToChat",
                         conditions: (module) => (module.sendTextMsgToChat) ? module.sendTextMsgToChat : null
+                    },
+                    { 
+                        id: "sendDelete",
+                        conditions: (module) => (module.sendDelete) ? module.sendDelete : null 
                     },
                     {  
                         id: "SendSeen",
@@ -746,7 +750,7 @@
         }
     };
 
-     window.WAPI.sendMessageToID = function (id, message, done) {
+    window.WAPI.sendMessageToID = function (id, message, done) {
         try {
             window.getContact = (id) => {
                 return Store.WapQuery.queryExist(id);
@@ -1077,7 +1081,8 @@
 
     window.WAPI.deleteConversation = function (chatId, done) {
         let userId = new window.Store.UserConstructor(chatId, {intentionallyUsePrivateConstructor: true});
-        let conversation = window.Store.Chat.get(userId);
+        //let conversation = window.Store.Chat.get(userId);
+        let conversation = window.Store.sendDelete(userId, false);
 
         if(!conversation) {
             if(done !== undefined) {
@@ -1098,6 +1103,7 @@
 
         return true;
     };
+
 
    window.WAPI.deleteMessage = function (chatId, messageArray, revoke=false, done) {
     let userId = new window.Store.UserConstructor(chatId, {intentionallyUsePrivateConstructor: true});
@@ -1453,5 +1459,3 @@ window.WAPI.sendImage = function (imgBase64, chatid, filename, caption, done) {
             done(true); return true; 
         })
     }
-
-
