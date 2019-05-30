@@ -1081,8 +1081,7 @@
 
     window.WAPI.deleteConversation = function (chatId, done) {
         let userId = new window.Store.UserConstructor(chatId, {intentionallyUsePrivateConstructor: true});
-        //let conversation = window.Store.Chat.get(userId);
-        let conversation = window.Store.sendDelete(userId, false);
+        let conversation = window.Store.Chat.get(userId);
 
         if(!conversation) {
             if(done !== undefined) {
@@ -1091,7 +1090,7 @@
             return false;
         }
 
-        conversation.deleteMsgs().then(() => {
+        window.Store.SendDelete(conversation, false).then(() => {
             if (done !== undefined) {
                 done(true);
             }
@@ -1102,7 +1101,8 @@
         });
 
         return true;
-    };
+
+        };
 
 
    window.WAPI.deleteMessage = function (chatId, messageArray, revoke=false, done) {
