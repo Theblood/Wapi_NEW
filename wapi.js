@@ -1095,7 +1095,7 @@
             return false;
         }
 
-        conversation.delete().then(() => {
+        conversation.deleteMsgs().then(() => {
             if (done !== undefined) {
                 done(true);
             }
