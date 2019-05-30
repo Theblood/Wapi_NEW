@@ -8,6 +8,9 @@
      * functions and creates the Store object.
      */
     /**
+
+    INTENT 3mr.theblood.
+
     Repaired the function to send by id
     //OLD
     //var idUser = new window.Store.UserConstructor(id);
@@ -443,10 +446,10 @@
             let messageObj = messages[i];
 
             // found a read message: stop looking for others
-            if (typeof (messageObj.__x_isUnreadType) !== "boolean" || messageObj.__x_isUnreadType === false) {
+            if (typeof (messageObj.isNewMsg) !== "boolean" || messageObj.isNewMsg === false) {
                 continue;
             } else {
-                messageObj.__x_isUnreadType = false;
+                messageObj.isNewMsg = false;
                 // process it
                 let message = WAPI.processMessageObj(messageObj,
                         includeMe,
@@ -861,23 +864,22 @@
         if (done !== undefined) done(false)
         return false;
     };
-
-
-    window.WAPI.sendSeen = function (id, done) {
+ 
+    window.WAPI.sendSeen = function(id, done) {
         var chat = window.Store.Chat.get(id);
         if (chat !== undefined) {
             if (done !== undefined) {
-                chat.sendSeen(false).then(function () {
+                window.Store.SendSeen(chat).then(function() {
                     done(true);
                 });
                 return true;
             } else {
-                chat.sendSeen(false);
+                window.Store.SendSeen(chat);
                 return true;
             }
         }
         if (done !== undefined) done();
-        return false;
+            return false;
     };
 
     function isChatMessage(message) {
@@ -909,10 +911,10 @@
             const messages = messageGroupObj.msgs._models;
             for (let i = messages.length - 1; i >= 0; i--) {
                 let messageObj = messages[i];
-                if (typeof (messageObj.__x_isUnreadType) != "boolean" || messageObj.__x_isUnreadType === false) {
+                if (typeof (messageObj.isNewMsg) != "boolean" || messageObj.isNewMsg === false) {
                     continue;
                 } else {
-                    messageObj.__x_isUnreadType = false;
+                    messageObj.isNewMsg = false;
                     let message = WAPI.processMessageObj(messageObj, includeMe, includeNotifications);
                     if (message) {
                         messageGroup.messages.push(message);
@@ -1106,34 +1108,34 @@
         return true;
     };
 
-    window.WAPI.deleteMessage = function (chatId, messageArray, revoke=false, done) {
-        let userId = new window.Store.UserConstructor(chatId, {intentionallyUsePrivateConstructor: true});
-        let conversation = window.Store.Chat.get(userId);
+   window.WAPI.deleteMessage = function (chatId, messageArray, revoke=false, done) {
+    let userId = new window.Store.UserConstructor(chatId, {intentionallyUsePrivateConstructor: true});
+    let conversation = window.Store.Chat.get(userId);
 
-        if(!conversation) {
-            if(done !== undefined) {
-                done(false);
-            }
-            return false;
+    if(!conversation) {
+        if(done !== undefined) {
+            done(false);
         }
-        
-        if (!Array.isArray(messageArray)) {
-            messageArray = [messageArray];
-        }
+        return false;
+    }
+    
+    if (!Array.isArray(messageArray)) {
+        messageArray = [messageArray];
+    }
 
-        if(revoke){
-            conversation.sendRevokeMsgs(messageArray, conversation);    
-        }else{
-            conversation.sendDeleteMsgs(messageArray, conversation);    
-        }
-        
+    if(revoke){
+        conversation.sendRevokeMsgs(messageArray, conversation);    
+    }else{
+        conversation.sendDeleteMsgs(messageArray, conversation);    
+    }
+    
 
-        if (done !== undefined) {
-            done(true);
-        }
+    if (done !== undefined) {
+        done(true);
+    }
 
-        return true;
-    };
+    return true;
+  };
 
     window.WAPI.checkNumberStatus = function(id, done) {
         window.Store.WapQuery.queryExist(id).then((result) => {
@@ -1165,7 +1167,7 @@
     sessionStorage.removeItem('saved_msgs');
 
     window.WAPI._newMessagesListener = window.Store.Msg.on('add', (newMessage) => {
-        if (newMessage && newMessage.__x_isUnreadType && !newMessage.isSentByMe) {
+        if (newMessage && newMessage.isNewMsg && !newMessage.isSentByMe) {
             let message = window.WAPI.processMessageObj(newMessage, false, false);
             if (message) {
                 window.WAPI._newMessagesQueue.push(message);
@@ -1324,7 +1326,7 @@ window.WAPI.sendImage = function (imgBase64, chatid, filename, caption, done) {
             self: "out",
             t: parseInt(new Date().getTime() / 1000),
             to: chatId,
-            __x_isUnreadType: !0,
+            isNewMsg: !0,
         };
 
         if (Array.isArray(vcard)) {
@@ -1422,7 +1424,7 @@ window.WAPI.sendImage = function (imgBase64, chatid, filename, caption, done) {
             done(false); return false;
         }
         
-        metaDataGroup.participants.promoteParticipants([participant]).then(()=>{
+        window.Wap.promoteParticipants(metaDataGroup.id, [participant.id]).then(()=>{
             const checkParticipant = metaDataGroup.participants.get(idParticipant);
             if (checkParticipant !== undefined){ 
                 if (checkParticipant.__x_isAdmin){
@@ -1460,6 +1462,5 @@ window.WAPI.sendImage = function (imgBase64, chatid, filename, caption, done) {
             done(true); return true; 
         })
     }
-
 
 
