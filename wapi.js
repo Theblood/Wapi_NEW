@@ -6,6 +6,7 @@
  * Auto discovery the webpack object references of instances that contains all functions used by the WAPI
  * functions and creates the Store object.
  */
+
 if (!window.Store) {
     (function () {
         function getStore(modules) {
@@ -13,7 +14,6 @@ if (!window.Store) {
             let neededObjects = [
                 { id: "Store", conditions: (module) => (module.Chat && module.Msg) ? module : null },
                 { id: "MediaCollection", conditions: (module) => (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default : null },
-                { id: "ChatClass", conditions: (module) => (module.default && module.default.prototype && module.default.prototype.Collection !== undefined && module.default.prototype.Collection === "Chat") ? module : null },
                 { id: "MediaProcess", conditions: (module) => (module.BLOB) ? module : null },
                 { id: "Wap", conditions: (module) => (module.createGroup) ? module : null },
                 { id: "ServiceWorker", conditions: (module) => (module.default && module.default.killServiceWorker) ? module : null },
@@ -59,7 +59,7 @@ if (!window.Store) {
                                 window.Store[needObj.id] = needObj.foundedModule;
                             }
                         });
-                        window.Store.ChatClass.default.prototype.sendMessage = function (e) {
+                         window.Store.sendMessage = function (e) {
                             return window.Store.SendTextMsgToChat(this, ...arguments);
                         }
                         return window.Store;
@@ -269,10 +269,11 @@ window.WAPI.getAllChatIds = function (done) {
  * @returns {Array|*} List of chats
  */
 window.WAPI.getAllGroups = function (done) {
-    const groups = window.Store.Chat.filter((chat) => chat.isGroup);
+    var lil = window.Store.Chat.filter((chat) => chat.isGroup);
+    const t = lil.map((lil) => [lil.name,lil.id._serialized].join(";") || chat.name);
 
-    if (done !== undefined) done(groups);
-    return groups;
+    if (done !== undefined) done(t);
+    return t;
 };
 
 /**
@@ -285,6 +286,7 @@ window.WAPI.getAllGroups = function (done) {
 window.WAPI.getChat = function (id, done) {
     id = typeof id == "string" ? id : id._serialized;
     const found = window.Store.Chat.get(id);
+    found.sendMessage = (found.sendMessage) ? found.sendMessage : function () { return window.Store.sendMessage.apply(this, arguments); };
     if (done !== undefined) done(found);
     return found;
 }
@@ -486,6 +488,18 @@ window.WAPI.areAllMessagesLoaded = function (id, done) {
  * @returns None
  */
 
+// window.WAPI.loadEarlierMessagesTillDate = function (id, lastMessage, done) {
+//     const found = WAPI.getChat(id);
+//     x = function () {
+//         if (found.msgs.models[0].t > lastMessage) {
+//             found.loadEarlierMsgs().then(x);
+//         } else {
+//             done();
+//         }
+//     };
+//     x();
+// 
+
 window.WAPI.loadEarlierMessagesTillDate = function (id, lastMessage, done) {
     const found = WAPI.getChat(id);
     x = function () {
@@ -497,7 +511,6 @@ window.WAPI.loadEarlierMessagesTillDate = function (id, lastMessage, done) {
     };
     x();
 };
-
 
 /**
  * Fetches all group metadata objects from store
