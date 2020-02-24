@@ -1,5 +1,6 @@
 /**
  * This script contains WAPI functions that need to be run in the context of the webpage
+ * MrTheblood.
  */
 
 /**
@@ -13,7 +14,7 @@ if (!window.Store) {
             let foundCount = 0;
             let neededObjects = [
                 { id: "Store", conditions: (module) => (module.Chat && module.Msg) ? module : null },
-                { id: "MediaCollection", conditions: (module) => (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default : null },
+                { id: "MediaCollection", conditions: (module) => (module.default && module.default.prototype && module.default.prototype.processAttachments) ? module.default : null },
                 { id: "MediaProcess", conditions: (module) => (module.BLOB) ? module : null },
                 { id: "Wap", conditions: (module) => (module.createGroup) ? module : null },
                 { id: "ServiceWorker", conditions: (module) => (module.default && module.default.killServiceWorker) ? module : null },
@@ -286,7 +287,8 @@ window.WAPI.getAllGroups = function (done) {
 window.WAPI.getChat = function (id, done) {
     id = typeof id == "string" ? id : id._serialized;
     const found = window.Store.Chat.get(id);
-    found.sendMessage = (found.sendMessage) ? found.sendMessage : function () { return window.Store.sendMessage.apply(this, arguments); };
+        if (found)
+        found.sendMessage = (found.sendMessage) ? found.sendMessage : function () { return window.Store.sendMessage.apply(this, arguments); };
     if (done !== undefined) done(found);
     return found;
 }
@@ -675,12 +677,19 @@ window.WAPI.ReplyMessage = function (idMessage, message, done) {
         if (done !== undefined) done(false);
         return false;
     }
-    messageObject = messageObject.value();
+    messageObject = messageObject.valueOf();
+
+    let params = {
+        linkPreview : null, 
+        mentionedJidList : null, 
+        quotedMsg : messageObject, 
+        quotedMsgAdminGroupJid : null
+    };
 
     const chat = WAPI.getChat(messageObject.chat.id)
     if (chat !== undefined) {
         if (done !== undefined) {
-            chat.sendMessage(message, null, messageObject).then(function () {
+            chat.sendMessage(message, params, messageObject).then(function () {
                 function sleep(ms) {
                     return new Promise(resolve => setTimeout(resolve, ms));
                 }
@@ -709,7 +718,7 @@ window.WAPI.ReplyMessage = function (idMessage, message, done) {
             });
             return true;
         } else {
-            chat.sendMessage(message, null, messageObject);
+            chat.sendMessage(message, params, messageObject);
             return true;
         }
     } else {
@@ -717,6 +726,7 @@ window.WAPI.ReplyMessage = function (idMessage, message, done) {
         return false;
     }
 };
+
 
 window.WAPI.sendMessageToID = function (id, message, done) {
     try {
@@ -831,13 +841,13 @@ window.WAPI.sendSeen = function (id, done) {
     var chat = window.WAPI.getChat(id);
     if (chat !== undefined) {
         if (done !== undefined) {
-            //Store.SendSeen(Store.Chat.models[0], false).then(function () {
+            if (chat.getLastMsgKeyForAction === undefined)
+                chat.getLastMsgKeyForAction = function () { };
             Store.SendSeen(chat, false).then(function () {
                 done(true);
             });
             return true;
         } else {
-            //Store.SendSeen(Store.Chat.models[0], false);
             Store.SendSeen(Chat, false);
             return true;
         }
@@ -1220,8 +1230,8 @@ var idUser = new window.Store.UserConstructor(chatid, { intentionallyUsePrivateC
 // create new chat
 return Store.Chat.find(idUser).then((chat) => {
     var mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
-    var mc = new Store.MediaCollection();
-    mc.processFiles([mediaBlob], chat, 1).then(() => {
+    var mc = new Store.MediaCollection(chat);
+    mc.processAttachments([{file: mediaBlob}, 1], chat, 1).then(() => {
         var media = mc.models[0];
         media.sendToChat(chat, { caption: caption });
         if (done !== undefined) done(true);
