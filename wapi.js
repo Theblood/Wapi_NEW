@@ -69,7 +69,20 @@ if (!window.Store) {
             }
         }
 
-        webpackJsonp([], { 'parasite': (x, y, z) => getStore(z) }, ['parasite']);
+        //webpackJsonp([], { 'parasite': (x, y, z) => getStore(z) }, ['parasite']);
+        /*
+        Code update thanks to
+        topkek,bobaoapae, TinsWeb, KopeK, Bruno, Bento
+        */
+        webpackJsonp.push([
+            ["parasite"],
+            {
+                parasite: function (o, e, t) {
+                    getStore(t);
+                }
+            },
+            [["parasite"]]
+        ]);
     })();
 }
 
